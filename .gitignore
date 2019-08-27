@@ -1,0 +1,6 @@
+**/model
+.idea/
+**.pyc
+data/
+**/**.pyc
+**/*.pyc
