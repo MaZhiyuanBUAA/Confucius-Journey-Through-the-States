@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>周游列国：孔子学院（MVP）</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <h1>周游列国：孔子学院</h1>
+      <p class="subtitle">每天 10 分钟，轻松学《论语》</p>
+      <section class="stats" aria-label="玩家成长数据">
+        <div>学识值：<strong id="knowledgeScore">0</strong></div>
+        <div>德行值：<strong id="virtueScore">0</strong></div>
+        <div>智：<strong id="wisdomScore">0</strong></div>
+      </section>
+    </header>
+
+    <section id="screen" class="card" aria-live="polite"></section>
+
+    <footer class="actions">
+      <button id="nextBtn" class="btn" hidden>继续</button>
+      <button id="restartBtn" class="btn btn-secondary" hidden>重新开始</button>
+    </footer>
+  </main>
+
+  <script src="./game.js"></script>
+</body>
+</html>
