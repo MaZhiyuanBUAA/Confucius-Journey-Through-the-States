@@ -1,0 +1,153 @@
+:root {
+  --bg: #f7f2e8;
+  --ink: #2c2c2c;
+  --primary: #8b4513;
+  --primary-soft: #e9d3be;
+  --success: #245f38;
+  --warn: #825200;
+  --card: #fff;
+  --border: #d8c3ab;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+  background: linear-gradient(160deg, var(--bg), #fefaf1);
+  color: var(--ink);
+}
+
+.app {
+  width: min(900px, 92vw);
+  margin: 24px auto;
+  display: grid;
+  gap: 16px;
+}
+
+.topbar {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+h1 {
+  margin: 0 0 8px;
+  color: var(--primary);
+}
+
+.subtitle {
+  margin: 0 0 12px;
+  color: #5f5b53;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.stats > div {
+  background: var(--primary-soft);
+  border-radius: 999px;
+  padding: 6px 12px;
+}
+
+.card {
+  min-height: 380px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.stage {
+  display: grid;
+  gap: 14px;
+}
+
+.stage h2 { margin: 0; }
+
+.notice {
+  background: #fff7e6;
+  border-left: 4px solid #e5a93f;
+  padding: 10px;
+}
+
+.map {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.spot {
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  background: #fffdf8;
+  padding: 14px;
+}
+
+.spot button,
+.choice button,
+.quiz-options button,
+.btn {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--primary);
+  background: #fff;
+  color: var(--primary);
+  cursor: pointer;
+}
+
+.spot button:disabled,
+.choice button:disabled,
+.quiz-options button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.choice,
+.quiz-options {
+  display: grid;
+  gap: 8px;
+}
+
+.feedback {
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.feedback.good {
+  background: #ecf8f0;
+  color: var(--success);
+}
+
+.feedback.warn {
+  background: #fff7ea;
+  color: var(--warn);
+}
+
+.progress {
+  font-size: 14px;
+  color: #5e5a51;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn {
+  width: auto;
+  min-width: 120px;
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-secondary {
+  background: #fff;
+  color: var(--primary);
+}
