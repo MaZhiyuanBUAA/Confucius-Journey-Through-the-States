@@ -19,7 +19,11 @@ const state = {
   choiceDone: false,
   quizDone: false,
   comboCorrect: 0,
-  totalCorrect: 0
+  totalCorrect: 0,
+  chapter3Intel: 0,
+  chapter3Actions: 0,
+  chapter3Mistakes: 0,
+  chapter4Pressure: 0
 };
 
 const chapter1Clues = [
@@ -63,6 +67,77 @@ const chapter2Quiz = [
   }
 ];
 
+const chapter3Spots = [
+  { name: '齐国课堂记录', kind: 'core', text: '记录显示：先复盘错因再上新题，次日正确率提升 24%。' },
+  { name: '名师速记秘籍', kind: 'trap', text: '宣称“只背模板就能通吃全部题型”，忽略理解。' },
+  { name: '同伴互评单', kind: 'core', text: '互评能暴露“会做但讲不清”的薄弱点。' },
+  { name: '热帖排行榜', kind: 'noise', text: '讨论很热闹，但几乎没有可迁移的方法。' },
+  { name: '错题演算纸', kind: 'core', text: '你找到“审题-列式-验算”三段式自检流程。' },
+  { name: '押题密卷', kind: 'trap', text: '只押最后 3 题，风险极高。' }
+];
+
+const chapter3DebateQuestions = [
+  {
+    q: '队友坚持“只做新题更快进步”，你如何回应？',
+    options: [
+      { text: 'A. 认同，时间都给新题', correct: false },
+      { text: 'B. 先用错题定位漏洞，再做新题检验迁移', correct: true },
+      { text: 'C. 全部交给学霸讲，自己不总结', correct: false }
+    ]
+  },
+  {
+    q: '面对团队分歧，最符合“三人行，必有我师”的做法是？',
+    options: [
+      { text: 'A. 谁声音大听谁', correct: false },
+      { text: 'B. 给每人 1 分钟陈述证据，再汇总最佳策略', correct: true },
+      { text: 'C. 直接按你自己的习惯执行', correct: false }
+    ]
+  },
+  {
+    q: '本轮冲刺只剩 8 分钟，应该优先做什么？',
+    options: [
+      { text: 'A. 随机刷题拼运气', correct: false },
+      { text: 'B. 复盘本日高频错因，做 1 题针对训练', correct: true },
+      { text: 'C. 看别人笔记，不动笔', correct: false }
+    ]
+  },
+  {
+    q: '若你连续答错两题，最佳补救策略是？',
+    options: [
+      { text: 'A. 保持原节奏继续蒙', correct: false },
+      { text: 'B. 立刻暂停 90 秒，回看错因并重建步骤', correct: true },
+      { text: 'C. 直接放弃本轮挑战', correct: false }
+    ]
+  }
+];
+
+const chapter4Boss = [
+  {
+    q: 'Boss 问：以下哪种学习闭环最稳？',
+    options: [
+      { text: 'A. 新题→新题→新题', score: 0 },
+      { text: 'B. 错因复盘→针对训练→讲给同伴→再测', score: 2 },
+      { text: 'C. 看答案→抄笔记→结束', score: 0 }
+    ]
+  },
+  {
+    q: 'Boss 问：团队中有人拖延，你应如何处理？',
+    options: [
+      { text: 'A. 指责并孤立他', score: 0 },
+      { text: 'B. 与其共定最小目标并追踪完成', score: 2 },
+      { text: 'C. 直接替他全部完成', score: 1 }
+    ]
+  },
+  {
+    q: 'Boss 问：考前最后 15 分钟，收益最高的是？',
+    options: [
+      { text: 'A. 复盘易错清单与关键步骤', score: 2 },
+      { text: 'B. 刷社交媒体放松', score: 0 },
+      { text: 'C. 随机翻新题答案', score: 1 }
+    ]
+  }
+];
+
 const stages = [
   renderChapter1Story,
   renderChapter1Explore,
@@ -73,6 +148,11 @@ const stages = [
   renderChapter2Explore,
   renderChapter2Choice,
   renderChapter2Quiz,
+  renderChapter3Story,
+  renderChapter3Explore,
+  renderChapter3Choice,
+  renderChapter3Quiz,
+  renderChapter4Boss,
   renderFinalSummary
 ];
 
@@ -95,7 +175,7 @@ function renderChapter1Story() {
       <h2>第一章：拜师入门 · 学而时习之</h2>
       <p>你刚进入鲁国学宫，孔子问你：“学习最重要的是什么？”</p>
       <p class="notice">本章目标：完成探索、做一次价值抉择、通过知识挑战。</p>
-      <p class="progress">流程 1/10：剧情对话（约 2 分钟）</p>
+      <p class="progress">流程 1/15：剧情对话（约 2 分钟）</p>
     </article>
   `;
   nextBtn.hidden = false;
@@ -108,7 +188,7 @@ function renderChapter1Explore() {
       <p>点击 3 个地点，收集线索再继续。</p>
       <section id="map" class="map"></section>
       <div id="clueLog" class="notice">当前线索：0 / 3</div>
-      <p class="progress">流程 2/10：探索与收集（约 3 分钟）</p>
+      <p class="progress">流程 2/15：探索与收集（约 3 分钟）</p>
     </article>
   `;
 
@@ -149,7 +229,7 @@ function renderChapter1Choice() {
         <button data-type="good">每天复盘错题 10 分钟并请教同学</button>
       </section>
       <div id="choiceFeedback"></div>
-      <p class="progress">流程 3/10：抉择挑战（约 2 分钟）</p>
+      <p class="progress">流程 3/15：抉择挑战（约 2 分钟）</p>
     </article>
   `;
 
@@ -192,7 +272,7 @@ function renderChapter1Quiz() {
         <button data-correct="false">C. 只要考试高分</button>
       </section>
       <div id="quizFeedback"></div>
-      <p class="progress">流程 4/10：知识小战斗（约 3 分钟）</p>
+      <p class="progress">流程 4/15：知识小战斗（约 3 分钟）</p>
     </article>
   `;
 
@@ -232,7 +312,7 @@ function renderChapter1Summary() {
         <li>智：${state.wisdom}</li>
       </ul>
       <p class="notice">解锁新章：<strong>温故而知新</strong>。挑战升级：真假线索、三连问答、连击加成。</p>
-      <p class="progress">流程 5/10：章节结算（约 1 分钟）</p>
+      <p class="progress">流程 5/15：章节结算（约 1 分钟）</p>
     </article>
   `;
   nextBtn.hidden = false;
@@ -244,7 +324,7 @@ function renderChapter2Story() {
       <h2>第二章：温故而知新</h2>
       <p>你被派往齐国学舍做助教，需要在有限行动中找出真正有效的学习方法。</p>
       <p class="notice">本章新增机制：误选干扰项会扣减智值，答题连击可获得额外奖励。</p>
-      <p class="progress">流程 6/10：新章导入（约 2 分钟）</p>
+      <p class="progress">流程 6/15：新章导入（约 2 分钟）</p>
     </article>
   `;
   nextBtn.hidden = false;
@@ -258,7 +338,7 @@ function renderChapter2Explore() {
       <section id="hardMap" class="map"></section>
       <div id="hardLog" class="notice">已获有效线索：0 / 3 ｜ 已行动：0 / 4</div>
       <div id="hardFeedback"></div>
-      <p class="progress">流程 7/10：高难探索（约 3 分钟）</p>
+      <p class="progress">流程 7/15：高难探索（约 3 分钟）</p>
     </article>
   `;
 
@@ -322,7 +402,7 @@ function renderChapter2Choice() {
         <button data-type="bad">大家各学各的，不做复盘</button>
       </section>
       <div id="choiceFeedback2"></div>
-      <p class="progress">流程 8/10：进阶抉择（约 2 分钟）</p>
+      <p class="progress">流程 8/15：进阶抉择（约 2 分钟）</p>
     </article>
   `;
 
@@ -370,7 +450,7 @@ function renderChapter2Quiz() {
       <div id="quizHard"></div>
       <div id="quizHardFeedback"></div>
       <p class="notice">规则：连续答对可触发连击奖励（+5 智值），共 3 题。</p>
-      <p class="progress">流程 9/10：高难问答（约 4 分钟）</p>
+      <p class="progress">流程 9/15：高难问答（约 4 分钟）</p>
     </article>
   `;
 
@@ -452,21 +532,334 @@ function renderChapter2Quiz() {
   renderQuestion();
 }
 
-function renderFinalSummary() {
-  const rank = state.knowledge + state.virtue + state.wisdom >= 110 ? '杏坛优等生' : '杏坛进阶生';
+function renderChapter3Story() {
+  screen.innerHTML = `
+    <article class="stage">
+      <h2>第三章：三人行，必有我师</h2>
+      <p>你带领学习小队进入魏国学坊，本章将引入“失误惩罚”和“团队协同”双重压力。</p>
+      <p class="notice">新增难度：可行动次数更少、误判会累计失误值，失误过多将触发额外惩罚。</p>
+      <p class="progress">流程 10/15：章节导入（约 2 分钟）</p>
+    </article>
+  `;
+  nextBtn.hidden = false;
+}
+
+function renderChapter3Explore() {
+  state.chapter3Intel = 0;
+  state.chapter3Actions = 0;
+  state.chapter3Mistakes = 0;
 
   screen.innerHTML = `
     <article class="stage">
-      <h2>两章通关结算</h2>
-      <p>恭喜！你已完成前两章核心修学。</p>
+      <h2>高压侦查：6 选 4</h2>
+      <p>规则：6 个地点中仅 3 个核心情报。你只有 4 次行动机会，且误判 2 次会额外扣分。</p>
+      <section id="chapter3Map" class="map"></section>
+      <div id="chapter3Log" class="notice">核心情报：0 / 3 ｜ 行动：0 / 4 ｜ 失误：0 / 2</div>
+      <div id="chapter3Feedback"></div>
+      <p class="progress">流程 11/15：高压探索（约 3 分钟）</p>
+    </article>
+  `;
+
+  const map = document.getElementById('chapter3Map');
+  const log = document.getElementById('chapter3Log');
+  const feedback = document.getElementById('chapter3Feedback');
+
+  function updateLog() {
+    log.textContent = `核心情报：${state.chapter3Intel} / 3 ｜ 行动：${state.chapter3Actions} / 4 ｜ 失误：${state.chapter3Mistakes} / 2`;
+  }
+
+  chapter3Spots.forEach((spot) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'spot';
+    wrapper.innerHTML = `<button type="button">${spot.name}</button><p></p>`;
+    const btn = wrapper.querySelector('button');
+    const text = wrapper.querySelector('p');
+
+    btn.addEventListener('click', () => {
+      if (state.chapter3Actions >= 4 || state.chapter3Intel >= 3) return;
+
+      btn.disabled = true;
+      state.chapter3Actions += 1;
+      text.textContent = spot.text;
+
+      if (spot.kind === 'core') {
+        state.chapter3Intel += 1;
+        state.knowledge += 9;
+        state.wisdom += 3;
+        feedback.className = 'feedback good';
+        feedback.textContent = '命中核心情报！你的小队决策可信度提升。';
+      } else {
+        state.chapter3Mistakes += 1;
+        state.wisdom = Math.max(0, state.wisdom - 3);
+        feedback.className = 'feedback warn';
+        feedback.textContent = '误判！该信息无法形成有效策略，智值 -3。';
+      }
+
+      if (state.chapter3Mistakes >= 2) {
+        state.virtue = Math.max(0, state.virtue - 2);
+        feedback.textContent += ' 失误累计过高，团队士气下降，德行 -2。';
+      }
+
+      updateLog();
+      updateScoreboard();
+
+      if (state.chapter3Intel >= 3) {
+        feedback.className = 'feedback good';
+        feedback.textContent = '你在限制行动内完成侦查，成功锁定全部核心情报。';
+        nextBtn.hidden = false;
+      } else if (state.chapter3Actions >= 4) {
+        feedback.className = 'feedback warn';
+        feedback.textContent = '行动次数耗尽，本轮以残缺情报推进。';
+        nextBtn.hidden = false;
+      }
+    });
+
+    map.appendChild(wrapper);
+  });
+}
+
+function renderChapter3Choice() {
+  let done = false;
+  screen.innerHTML = `
+    <article class="stage">
+      <h2>团队分歧抉择</h2>
+      <p>队友出现争执：有人主张刷量，有人主张复盘。你作为队长怎么安排？</p>
+      <section class="choice" id="chapter3ChoicePanel">
+        <button data-type="bad">按投票多数决定，不做证据核验</button>
+        <button data-type="mid">先做新题，再看时间是否复盘</button>
+        <button data-type="good">先对齐错因证据，再分工练习并互讲</button>
+      </section>
+      <div id="chapter3ChoiceFeedback"></div>
+      <p class="progress">流程 12/15：协作抉择（约 2 分钟）</p>
+    </article>
+  `;
+
+  const panel = document.getElementById('chapter3ChoicePanel');
+  const feedback = document.getElementById('chapter3ChoiceFeedback');
+
+  panel.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLButtonElement) || done) return;
+
+    done = true;
+    panel.querySelectorAll('button').forEach((btn) => (btn.disabled = true));
+
+    if (target.dataset.type === 'good') {
+      state.virtue += 16;
+      state.wisdom += 14;
+      feedback.className = 'feedback good';
+      feedback.textContent = '完美决策！你让团队在证据与分工下高效协同。';
+    } else if (target.dataset.type === 'mid') {
+      state.virtue += 8;
+      state.wisdom += 6;
+      feedback.className = 'feedback warn';
+      feedback.textContent = '方案可用，但复盘顺序偏后会降低稳定收益。';
+    } else {
+      state.virtue += 3;
+      state.wisdom += 2;
+      feedback.className = 'feedback warn';
+      feedback.textContent = '决策过于粗放，团队容易在低效争论中消耗时间。';
+    }
+
+    updateScoreboard();
+    nextBtn.hidden = false;
+  });
+}
+
+function renderChapter3Quiz() {
+  let qIndex = 0;
+  let correctStreak = 0;
+  let correctTotal = 0;
+
+  screen.innerHTML = `
+    <article class="stage">
+      <h2>四连辩论：限时校验</h2>
+      <div id="chapter3QuizWrap"></div>
+      <div id="chapter3QuizFeedback"></div>
+      <p class="notice">规则：共 4 题。连续答对 3 题可触发“师者连携”奖励（学识 +8，智值 +6）。</p>
+      <p class="progress">流程 13/15：极限问答（约 4 分钟）</p>
+    </article>
+  `;
+
+  const wrap = document.getElementById('chapter3QuizWrap');
+  const feedback = document.getElementById('chapter3QuizFeedback');
+
+  function renderQuestion() {
+    const current = chapter3DebateQuestions[qIndex];
+    wrap.innerHTML = `
+      <p><strong>第 ${qIndex + 1} 题：</strong>${current.q}</p>
+      <section class="quiz-options" id="chapter3QuizPanel">
+        ${current.options.map((opt) => `<button data-correct="${opt.correct}">${opt.text}</button>`).join('')}
+      </section>
+      <p class="progress">总正确：${correctTotal} / ${chapter3DebateQuestions.length} ｜ 连续正确：${correctStreak}</p>
+    `;
+
+    const panel = document.getElementById('chapter3QuizPanel');
+    panel.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLButtonElement)) return;
+
+      panel.querySelectorAll('button').forEach((btn) => (btn.disabled = true));
+
+      if (target.dataset.correct === 'true') {
+        correctTotal += 1;
+        correctStreak += 1;
+        state.knowledge += 11;
+        feedback.className = 'feedback good';
+        feedback.textContent = '论证成立，队友认可你的判断。';
+      } else {
+        correctStreak = 0;
+        state.knowledge += 5;
+        state.wisdom = Math.max(0, state.wisdom - 2);
+        feedback.className = 'feedback warn';
+        feedback.textContent = '论证证据不足，智值 -2。';
+      }
+
+      updateScoreboard();
+
+      setTimeout(() => {
+        qIndex += 1;
+        if (qIndex < chapter3DebateQuestions.length) {
+          renderQuestion();
+        } else {
+          if (correctTotal >= 3) {
+            state.virtue += 9;
+            feedback.className = 'feedback good';
+            feedback.textContent = '你通过了辩论校验，小队进入最终试炼。';
+          } else {
+            state.virtue += 4;
+            feedback.className = 'feedback warn';
+            feedback.textContent = '你勉强完成辩论，建议补做一次错因梳理。';
+          }
+
+          if (correctStreak >= 3) {
+            state.knowledge += 8;
+            state.wisdom += 6;
+            feedback.textContent += ' 师者连携触发，学识 +8，智值 +6！';
+          }
+
+          updateScoreboard();
+          wrap.innerHTML = '<p>四连辩论结束，准备迎战最终 Boss。</p>';
+          nextBtn.hidden = false;
+        }
+      }, 450);
+    });
+  }
+
+  renderQuestion();
+}
+
+function renderChapter4Boss() {
+  let qIndex = 0;
+  let bossScore = 0;
+  state.chapter4Pressure = 0;
+
+  screen.innerHTML = `
+    <article class="stage">
+      <h2>终章试炼：杏坛大辩</h2>
+      <div id="bossWrap"></div>
+      <div id="bossFeedback"></div>
+      <p class="notice">规则：Boss 会连续施压。若连续低分回答 2 次，将触发压力惩罚（德行 -3）。</p>
+      <p class="progress">流程 14/15：Boss 关（约 4 分钟）</p>
+    </article>
+  `;
+
+  const wrap = document.getElementById('bossWrap');
+  const feedback = document.getElementById('bossFeedback');
+
+  function renderBossQuestion() {
+    const current = chapter4Boss[qIndex];
+    wrap.innerHTML = `
+      <p><strong>Boss 题 ${qIndex + 1}：</strong>${current.q}</p>
+      <section class="quiz-options" id="bossPanel">
+        ${current.options.map((opt) => `<button data-score="${opt.score}">${opt.text}</button>`).join('')}
+      </section>
+      <p class="progress">Boss 评分：${bossScore} / 6 ｜ 压力值：${state.chapter4Pressure}</p>
+    `;
+
+    const panel = document.getElementById('bossPanel');
+    panel.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLButtonElement)) return;
+
+      panel.querySelectorAll('button').forEach((btn) => (btn.disabled = true));
+      const score = Number(target.dataset.score);
+      bossScore += score;
+
+      if (score >= 2) {
+        state.chapter4Pressure = 0;
+        state.knowledge += 12;
+        state.wisdom += 6;
+        feedback.className = 'feedback good';
+        feedback.textContent = '高质量回应！Boss 的追问被你稳住了。';
+      } else {
+        state.chapter4Pressure += 1;
+        state.knowledge += 4;
+        feedback.className = 'feedback warn';
+        feedback.textContent = '回应偏弱，Boss 继续施压。';
+      }
+
+      if (state.chapter4Pressure >= 2) {
+        state.virtue = Math.max(0, state.virtue - 3);
+        state.chapter4Pressure = 0;
+        feedback.textContent += ' 连续失守触发压力惩罚：德行 -3。';
+      }
+
+      updateScoreboard();
+
+      setTimeout(() => {
+        qIndex += 1;
+        if (qIndex < chapter4Boss.length) {
+          renderBossQuestion();
+        } else {
+          if (bossScore >= 5) {
+            state.virtue += 14;
+            state.wisdom += 10;
+            feedback.className = 'feedback good';
+            feedback.textContent = 'Boss 被你说服！你完成了最高难度试炼。';
+          } else if (bossScore >= 3) {
+            state.virtue += 8;
+            feedback.className = 'feedback good';
+            feedback.textContent = '你成功守住主线论证，顺利通关。';
+          } else {
+            state.virtue += 3;
+            feedback.className = 'feedback warn';
+            feedback.textContent = '你勉强通过试炼，建议回看前三章策略链。';
+          }
+
+          updateScoreboard();
+          wrap.innerHTML = '<p>终章试炼结束，正在生成你的杏坛评定...</p>';
+          nextBtn.hidden = false;
+        }
+      }, 450);
+    });
+  }
+
+  renderBossQuestion();
+}
+
+function renderFinalSummary() {
+  const total = state.knowledge + state.virtue + state.wisdom;
+  let rank = '杏坛进阶生';
+  if (total >= 220) {
+    rank = '杏坛宗师';
+  } else if (total >= 150) {
+    rank = '杏坛优等生';
+  }
+
+  screen.innerHTML = `
+    <article class="stage">
+      <h2>四章通关结算</h2>
+      <p>恭喜！你已完成从入门到 Boss 试炼的完整修学之路。</p>
       <ul>
         <li>学识值：${state.knowledge}</li>
         <li>德行值：${state.virtue}</li>
         <li>智：${state.wisdom}</li>
+        <li>总评：${total}</li>
         <li>称号：<strong>${rank}</strong></li>
       </ul>
-      <p class="notice">后续章节预告：<strong>第三章《三人行，必有我师》</strong>（协作博弈 + 角色互补）。</p>
-      <p class="progress">流程 10/10：最终结算（约 1 分钟）</p>
+      <p class="notice">终局建议：把“复盘-迁移-互讲-再测”写进你的每日学习流程。</p>
+      <p class="progress">流程 15/15：最终结算（约 1 分钟）</p>
     </article>
   `;
 
@@ -494,7 +887,11 @@ restartBtn.addEventListener('click', () => {
     choiceDone: false,
     quizDone: false,
     comboCorrect: 0,
-    totalCorrect: 0
+    totalCorrect: 0,
+    chapter3Intel: 0,
+    chapter3Actions: 0,
+    chapter3Mistakes: 0,
+    chapter4Pressure: 0
   });
   restartBtn.hidden = true;
   updateScoreboard();
