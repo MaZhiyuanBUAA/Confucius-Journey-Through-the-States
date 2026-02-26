@@ -10,3 +10,8 @@ python3 -m http.server 8000
 ```
 
 然后访问 `http://localhost:8000`。
+
+
+## 截图说明
+
+- 章节扩展截图说明见：`docs/screenshots.md`
