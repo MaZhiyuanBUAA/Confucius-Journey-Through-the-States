@@ -23,7 +23,12 @@ const state = {
   chapter3Intel: 0,
   chapter3Actions: 0,
   chapter3Mistakes: 0,
-  chapter4Pressure: 0
+  chapter4Pressure: 0,
+  chapter5DeckPicked: 0,
+  chapter5KnowledgeBoost: 0,
+  chapter5WisdomShield: 0,
+  chapter6Morale: 0,
+  chapter6Risk: 0
 };
 
 const chapter1Clues = [
@@ -138,6 +143,67 @@ const chapter4Boss = [
   }
 ];
 
+const chapter5Cards = [
+  { name: '温故卡', type: 'knowledge', value: 6, text: '后续每次正确回答额外获得学识 +6。' },
+  { name: '慎思卡', type: 'shield', value: 1, text: '后续答错时减少一次智值扣分。' },
+  { name: '笃行卡', type: 'virtue', value: 8, text: '完成章节时额外获得德行 +8。' },
+  { name: '互学卡', type: 'knowledge', value: 4, text: '后续每次正确回答额外获得学识 +4。' }
+];
+
+const chapter5RelayQuestions = [
+  {
+    q: '接力 1：队友说“时间不够，先跳过复盘”。你应如何调整？',
+    options: [
+      { text: 'A. 认同，直接进入新题海', correct: false },
+      { text: 'B. 用 3 分钟锁定最高频错因，再进入新题', correct: true },
+      { text: 'C. 完全停止训练', correct: false }
+    ]
+  },
+  {
+    q: '接力 2：小组成员水平差异大，最佳协作是？',
+    options: [
+      { text: 'A. 全体做同一难度，不分层', correct: false },
+      { text: 'B. 基础组复盘，进阶组迁移，最后互讲', correct: true },
+      { text: 'C. 学霸独自刷题', correct: false }
+    ]
+  },
+  {
+    q: '接力 3：如何验证“真的掌握”而不是“看懂了”？',
+    options: [
+      { text: 'A. 不看步骤，口头说会了', correct: false },
+      { text: 'B. 闭卷重做并向同伴讲解关键步骤', correct: true },
+      { text: 'C. 只抄一次标准答案', correct: false }
+    ]
+  }
+];
+
+const chapter6Summit = [
+  {
+    q: '会盟议题一：跨班协作时，怎样保持“和而不同”？',
+    options: [
+      { text: 'A. 强制统一所有方法', score: 0 },
+      { text: 'B. 先统一目标，再允许方法差异并用证据复盘', score: 2 },
+      { text: 'C. 谁都不需要沟通', score: 0 }
+    ]
+  },
+  {
+    q: '会盟议题二：当数据表现下滑，第一反应应是？',
+    options: [
+      { text: 'A. 指责执行不力', score: 0 },
+      { text: 'B. 拆分问题来源：目标、方法、执行，再逐一修正', score: 2 },
+      { text: 'C. 完全推翻原计划', score: 1 }
+    ]
+  },
+  {
+    q: '会盟议题三：如何让学习机制长期运转？',
+    options: [
+      { text: 'A. 只在考试周突击', score: 0 },
+      { text: 'B. 固定“复盘-迁移-互讲-再测”周循环', score: 2 },
+      { text: 'C. 每次都换全新流程', score: 1 }
+    ]
+  }
+];
+
 const stages = [
   renderChapter1Story,
   renderChapter1Explore,
@@ -153,6 +219,11 @@ const stages = [
   renderChapter3Choice,
   renderChapter3Quiz,
   renderChapter4Boss,
+  renderChapter5Story,
+  renderChapter5Draft,
+  renderChapter5Relay,
+  renderChapter6Story,
+  renderChapter6Summit,
   renderFinalSummary
 ];
 
@@ -175,7 +246,7 @@ function renderChapter1Story() {
       <h2>第一章：拜师入门 · 学而时习之</h2>
       <p>你刚进入鲁国学宫，孔子问你：“学习最重要的是什么？”</p>
       <p class="notice">本章目标：完成探索、做一次价值抉择、通过知识挑战。</p>
-      <p class="progress">流程 1/15：剧情对话（约 2 分钟）</p>
+      <p class="progress">流程 1/20：剧情对话（约 2 分钟）</p>
     </article>
   `;
   nextBtn.hidden = false;
@@ -188,7 +259,7 @@ function renderChapter1Explore() {
       <p>点击 3 个地点，收集线索再继续。</p>
       <section id="map" class="map"></section>
       <div id="clueLog" class="notice">当前线索：0 / 3</div>
-      <p class="progress">流程 2/15：探索与收集（约 3 分钟）</p>
+      <p class="progress">流程 2/20：探索与收集（约 3 分钟）</p>
     </article>
   `;
 
@@ -229,7 +300,7 @@ function renderChapter1Choice() {
         <button data-type="good">每天复盘错题 10 分钟并请教同学</button>
       </section>
       <div id="choiceFeedback"></div>
-      <p class="progress">流程 3/15：抉择挑战（约 2 分钟）</p>
+      <p class="progress">流程 3/20：抉择挑战（约 2 分钟）</p>
     </article>
   `;
 
@@ -272,7 +343,7 @@ function renderChapter1Quiz() {
         <button data-correct="false">C. 只要考试高分</button>
       </section>
       <div id="quizFeedback"></div>
-      <p class="progress">流程 4/15：知识小战斗（约 3 分钟）</p>
+      <p class="progress">流程 4/20：知识小战斗（约 3 分钟）</p>
     </article>
   `;
 
@@ -312,7 +383,7 @@ function renderChapter1Summary() {
         <li>智：${state.wisdom}</li>
       </ul>
       <p class="notice">解锁新章：<strong>温故而知新</strong>。挑战升级：真假线索、三连问答、连击加成。</p>
-      <p class="progress">流程 5/15：章节结算（约 1 分钟）</p>
+      <p class="progress">流程 5/20：章节结算（约 1 分钟）</p>
     </article>
   `;
   nextBtn.hidden = false;
@@ -324,7 +395,7 @@ function renderChapter2Story() {
       <h2>第二章：温故而知新</h2>
       <p>你被派往齐国学舍做助教，需要在有限行动中找出真正有效的学习方法。</p>
       <p class="notice">本章新增机制：误选干扰项会扣减智值，答题连击可获得额外奖励。</p>
-      <p class="progress">流程 6/15：新章导入（约 2 分钟）</p>
+      <p class="progress">流程 6/20：新章导入（约 2 分钟）</p>
     </article>
   `;
   nextBtn.hidden = false;
@@ -338,7 +409,7 @@ function renderChapter2Explore() {
       <section id="hardMap" class="map"></section>
       <div id="hardLog" class="notice">已获有效线索：0 / 3 ｜ 已行动：0 / 4</div>
       <div id="hardFeedback"></div>
-      <p class="progress">流程 7/15：高难探索（约 3 分钟）</p>
+      <p class="progress">流程 7/20：高难探索（约 3 分钟）</p>
     </article>
   `;
 
@@ -402,7 +473,7 @@ function renderChapter2Choice() {
         <button data-type="bad">大家各学各的，不做复盘</button>
       </section>
       <div id="choiceFeedback2"></div>
-      <p class="progress">流程 8/15：进阶抉择（约 2 分钟）</p>
+      <p class="progress">流程 8/20：进阶抉择（约 2 分钟）</p>
     </article>
   `;
 
@@ -450,7 +521,7 @@ function renderChapter2Quiz() {
       <div id="quizHard"></div>
       <div id="quizHardFeedback"></div>
       <p class="notice">规则：连续答对可触发连击奖励（+5 智值），共 3 题。</p>
-      <p class="progress">流程 9/15：高难问答（约 4 分钟）</p>
+      <p class="progress">流程 9/20：高难问答（约 4 分钟）</p>
     </article>
   `;
 
@@ -538,7 +609,7 @@ function renderChapter3Story() {
       <h2>第三章：三人行，必有我师</h2>
       <p>你带领学习小队进入魏国学坊，本章将引入“失误惩罚”和“团队协同”双重压力。</p>
       <p class="notice">新增难度：可行动次数更少、误判会累计失误值，失误过多将触发额外惩罚。</p>
-      <p class="progress">流程 10/15：章节导入（约 2 分钟）</p>
+      <p class="progress">流程 10/20：章节导入（约 2 分钟）</p>
     </article>
   `;
   nextBtn.hidden = false;
@@ -556,7 +627,7 @@ function renderChapter3Explore() {
       <section id="chapter3Map" class="map"></section>
       <div id="chapter3Log" class="notice">核心情报：0 / 3 ｜ 行动：0 / 4 ｜ 失误：0 / 2</div>
       <div id="chapter3Feedback"></div>
-      <p class="progress">流程 11/15：高压探索（约 3 分钟）</p>
+      <p class="progress">流程 11/20：高压探索（约 3 分钟）</p>
     </article>
   `;
 
@@ -630,7 +701,7 @@ function renderChapter3Choice() {
         <button data-type="good">先对齐错因证据，再分工练习并互讲</button>
       </section>
       <div id="chapter3ChoiceFeedback"></div>
-      <p class="progress">流程 12/15：协作抉择（约 2 分钟）</p>
+      <p class="progress">流程 12/20：协作抉择（约 2 分钟）</p>
     </article>
   `;
 
@@ -677,7 +748,7 @@ function renderChapter3Quiz() {
       <div id="chapter3QuizWrap"></div>
       <div id="chapter3QuizFeedback"></div>
       <p class="notice">规则：共 4 题。连续答对 3 题可触发“师者连携”奖励（学识 +8，智值 +6）。</p>
-      <p class="progress">流程 13/15：极限问答（约 4 分钟）</p>
+      <p class="progress">流程 13/20：极限问答（约 4 分钟）</p>
     </article>
   `;
 
@@ -760,7 +831,7 @@ function renderChapter4Boss() {
       <div id="bossWrap"></div>
       <div id="bossFeedback"></div>
       <p class="notice">规则：Boss 会连续施压。若连续低分回答 2 次，将触发压力惩罚（德行 -3）。</p>
-      <p class="progress">流程 14/15：Boss 关（约 4 分钟）</p>
+      <p class="progress">流程 14/20：Boss 关（约 4 分钟）</p>
     </article>
   `;
 
@@ -838,6 +909,261 @@ function renderChapter4Boss() {
   renderBossQuestion();
 }
 
+function renderChapter5Story() {
+  screen.innerHTML = `
+    <article class="stage">
+      <h2>第五章：因材施教 · 策略构筑</h2>
+      <p>你来到陈国学营，需要先选择策略卡组，再完成接力问答。</p>
+      <p class="notice">新增玩法：开局选卡（增益构筑），不同卡组会改变后续得分表现。</p>
+      <p class="progress">流程 15/20：章节导入（约 2 分钟）</p>
+    </article>
+  `;
+  nextBtn.hidden = false;
+}
+
+function renderChapter5Draft() {
+  state.chapter5DeckPicked = 0;
+  state.chapter5KnowledgeBoost = 0;
+  state.chapter5WisdomShield = 0;
+  let virtueBonus = 0;
+
+  screen.innerHTML = `
+    <article class="stage">
+      <h2>策略构筑：从 4 张中选 2 张</h2>
+      <p>规则：不同卡牌提供不同增益。请根据你的短板构筑本章打法。</p>
+      <section id="deckPanel" class="map"></section>
+      <div id="deckLog" class="notice">已选择：0 / 2</div>
+      <div id="deckFeedback"></div>
+      <p class="progress">流程 16/20：卡组构筑（约 3 分钟）</p>
+    </article>
+  `;
+
+  const panel = document.getElementById('deckPanel');
+  const log = document.getElementById('deckLog');
+  const feedback = document.getElementById('deckFeedback');
+
+  chapter5Cards.forEach((card) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'spot';
+    wrapper.innerHTML = `<button type="button">${card.name}</button><p>${card.text}</p>`;
+    const btn = wrapper.querySelector('button');
+
+    btn.addEventListener('click', () => {
+      if (state.chapter5DeckPicked >= 2 || btn.disabled) return;
+
+      btn.disabled = true;
+      state.chapter5DeckPicked += 1;
+
+      if (card.type === 'knowledge') {
+        state.chapter5KnowledgeBoost += card.value;
+        feedback.className = 'feedback good';
+        feedback.textContent = `已激活学识增益：每次答对额外 +${state.chapter5KnowledgeBoost}。`;
+      } else if (card.type === 'shield') {
+        state.chapter5WisdomShield += card.value;
+        feedback.className = 'feedback good';
+        feedback.textContent = '已激活慎思护盾：可抵消一次答错惩罚。';
+      } else {
+        virtueBonus += card.value;
+        feedback.className = 'feedback good';
+        feedback.textContent = `已存储章末德行奖励 +${virtueBonus}。`;
+      }
+
+      log.textContent = `已选择：${state.chapter5DeckPicked} / 2`;
+
+      if (state.chapter5DeckPicked >= 2) {
+        state.virtue += virtueBonus;
+        updateScoreboard();
+        feedback.textContent += ' 构筑完成，准备进入接力试炼。';
+        nextBtn.hidden = false;
+      }
+    });
+
+    panel.appendChild(wrapper);
+  });
+}
+
+function renderChapter5Relay() {
+  let qIndex = 0;
+  let correct = 0;
+
+  screen.innerHTML = `
+    <article class="stage">
+      <h2>三段接力：动态增益试炼</h2>
+      <div id="relayWrap"></div>
+      <div id="relayFeedback"></div>
+      <p class="notice">规则：答对可获得学识基础 +10，再叠加你的卡组增益；答错可能扣智值。</p>
+      <p class="progress">流程 17/20：接力挑战（约 4 分钟）</p>
+    </article>
+  `;
+
+  const wrap = document.getElementById('relayWrap');
+  const feedback = document.getElementById('relayFeedback');
+
+  function renderQuestion() {
+    const current = chapter5RelayQuestions[qIndex];
+    wrap.innerHTML = `
+      <p><strong>接力题 ${qIndex + 1}：</strong>${current.q}</p>
+      <section class="quiz-options" id="relayPanel">
+        ${current.options.map((opt) => `<button data-correct="${opt.correct}">${opt.text}</button>`).join('')}
+      </section>
+      <p class="progress">正确数：${correct} / ${chapter5RelayQuestions.length} ｜ 慎思护盾：${state.chapter5WisdomShield}</p>
+    `;
+
+    const panel = document.getElementById('relayPanel');
+    panel.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLButtonElement)) return;
+
+      panel.querySelectorAll('button').forEach((btn) => (btn.disabled = true));
+
+      if (target.dataset.correct === 'true') {
+        correct += 1;
+        const gain = 10 + state.chapter5KnowledgeBoost;
+        state.knowledge += gain;
+        feedback.className = 'feedback good';
+        feedback.textContent = `回答正确！学识 +${gain}。`;
+      } else if (state.chapter5WisdomShield > 0) {
+        state.chapter5WisdomShield -= 1;
+        feedback.className = 'feedback warn';
+        feedback.textContent = '答错，但慎思护盾生效，本次不扣智值。';
+      } else {
+        state.wisdom = Math.max(0, state.wisdom - 4);
+        feedback.className = 'feedback warn';
+        feedback.textContent = '答错且无护盾，智值 -4。';
+      }
+
+      updateScoreboard();
+
+      setTimeout(() => {
+        qIndex += 1;
+        if (qIndex < chapter5RelayQuestions.length) {
+          renderQuestion();
+        } else {
+          if (correct >= 2) {
+            state.virtue += 10;
+            feedback.className = 'feedback good';
+            feedback.textContent = '接力成功！你的构筑策略通过实战验证。';
+          } else {
+            state.virtue += 4;
+            feedback.className = 'feedback warn';
+            feedback.textContent = '接力完成，但建议优化卡组选择逻辑。';
+          }
+
+          updateScoreboard();
+          wrap.innerHTML = '<p>第五章结束，下一章将进入跨国会盟终局。</p>';
+          nextBtn.hidden = false;
+        }
+      }, 400);
+    });
+  }
+
+  renderQuestion();
+}
+
+function renderChapter6Story() {
+  state.chapter6Morale = 2;
+  state.chapter6Risk = 0;
+
+  screen.innerHTML = `
+    <article class="stage">
+      <h2>第六章：列国会盟 · 终局共治</h2>
+      <p>你代表学宫参加会盟，需要在高压议题中守住团队士气并完成总论证。</p>
+      <p class="notice">新增玩法：士气值系统。低质量回应会累积风险，风险过高将降低士气。</p>
+      <p class="progress">流程 18/20：终章导入（约 2 分钟）</p>
+    </article>
+  `;
+  nextBtn.hidden = false;
+}
+
+function renderChapter6Summit() {
+  let qIndex = 0;
+  let summitScore = 0;
+
+  screen.innerHTML = `
+    <article class="stage">
+      <h2>会盟辩论：风险与士气管理</h2>
+      <div id="summitWrap"></div>
+      <div id="summitFeedback"></div>
+      <p class="notice">规则：每次低分回答会累计风险。风险达到 2 时触发士气 -1 并清空风险。</p>
+      <p class="progress">流程 19/20：会盟终试（约 4 分钟）</p>
+    </article>
+  `;
+
+  const wrap = document.getElementById('summitWrap');
+  const feedback = document.getElementById('summitFeedback');
+
+  function renderQuestion() {
+    const current = chapter6Summit[qIndex];
+    wrap.innerHTML = `
+      <p><strong>会盟题 ${qIndex + 1}：</strong>${current.q}</p>
+      <section class="quiz-options" id="summitPanel">
+        ${current.options.map((opt) => `<button data-score="${opt.score}">${opt.text}</button>`).join('')}
+      </section>
+      <p class="progress">会盟分：${summitScore} / 6 ｜ 士气：${state.chapter6Morale} ｜ 风险：${state.chapter6Risk}</p>
+    `;
+
+    const panel = document.getElementById('summitPanel');
+    panel.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLButtonElement)) return;
+
+      panel.querySelectorAll('button').forEach((btn) => (btn.disabled = true));
+      const score = Number(target.dataset.score);
+      summitScore += score;
+
+      if (score >= 2) {
+        state.chapter6Risk = 0;
+        state.knowledge += 12;
+        state.wisdom += 8;
+        feedback.className = 'feedback good';
+        feedback.textContent = '回应扎实，成功稳定会盟节奏。';
+      } else {
+        state.chapter6Risk += 1;
+        state.knowledge += 4;
+        feedback.className = 'feedback warn';
+        feedback.textContent = '回应偏弱，风险值上升。';
+      }
+
+      if (state.chapter6Risk >= 2) {
+        state.chapter6Morale = Math.max(0, state.chapter6Morale - 1);
+        state.virtue = Math.max(0, state.virtue - 2);
+        state.chapter6Risk = 0;
+        feedback.textContent += ' 风险爆发：士气 -1，德行 -2。';
+      }
+
+      updateScoreboard();
+
+      setTimeout(() => {
+        qIndex += 1;
+        if (qIndex < chapter6Summit.length) {
+          renderQuestion();
+        } else {
+          if (summitScore >= 5 && state.chapter6Morale >= 1) {
+            state.virtue += 16;
+            state.wisdom += 10;
+            feedback.className = 'feedback good';
+            feedback.textContent = '会盟大捷！你以稳定策略完成终局治理。';
+          } else if (summitScore >= 3) {
+            state.virtue += 9;
+            feedback.className = 'feedback good';
+            feedback.textContent = '会盟通过，你守住了核心议题。';
+          } else {
+            state.virtue += 4;
+            feedback.className = 'feedback warn';
+            feedback.textContent = '会盟惊险过关，建议回看卡组构筑与风险控制。';
+          }
+
+          updateScoreboard();
+          wrap.innerHTML = '<p>会盟终试结束，正在汇总你的六章成长档案...</p>';
+          nextBtn.hidden = false;
+        }
+      }, 400);
+    });
+  }
+
+  renderQuestion();
+}
+
 function renderFinalSummary() {
   const total = state.knowledge + state.virtue + state.wisdom;
   let rank = '杏坛进阶生';
@@ -849,8 +1175,8 @@ function renderFinalSummary() {
 
   screen.innerHTML = `
     <article class="stage">
-      <h2>四章通关结算</h2>
-      <p>恭喜！你已完成从入门到 Boss 试炼的完整修学之路。</p>
+      <h2>六章通关结算</h2>
+      <p>恭喜！你已完成从入门到会盟试炼的完整修学之路。</p>
       <ul>
         <li>学识值：${state.knowledge}</li>
         <li>德行值：${state.virtue}</li>
@@ -859,7 +1185,7 @@ function renderFinalSummary() {
         <li>称号：<strong>${rank}</strong></li>
       </ul>
       <p class="notice">终局建议：把“复盘-迁移-互讲-再测”写进你的每日学习流程。</p>
-      <p class="progress">流程 15/15：最终结算（约 1 分钟）</p>
+      <p class="progress">流程 20/20：最终结算（约 1 分钟）</p>
     </article>
   `;
 
@@ -891,7 +1217,12 @@ restartBtn.addEventListener('click', () => {
     chapter3Intel: 0,
     chapter3Actions: 0,
     chapter3Mistakes: 0,
-    chapter4Pressure: 0
+    chapter4Pressure: 0,
+    chapter5DeckPicked: 0,
+    chapter5KnowledgeBoost: 0,
+    chapter5WisdomShield: 0,
+    chapter6Morale: 0,
+    chapter6Risk: 0
   });
   restartBtn.hidden = true;
   updateScoreboard();
